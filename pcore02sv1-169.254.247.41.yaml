@@ -1,0 +1,61 @@
+name: MPLS BGP Sessions 169.254.247.41 Idle on pcore02.sv1
+summary:  'This is a BGP Sessions idle alert where circuit id:Zayo and IP: 169.254.247.41'
+type: frequency
+es_host:
+- es-master01.logpool.sv1.247-inc.net
+- es-master02.logpool.sv1.247-inc.net
+- es-master01.logpool.va1.247-inc.net
+es_port: 9200
+es_username: esadmin
+es_password: nm*ro(qc
+index: logstash-opsinfra-*
+num_events: 1
+timeframe: 5m
+realert: 5m
+view_records_as: consolidated
+kibana_url:https://logview02.pool.sv1.247-inc.net/goto/eb3d07e316e7936259bfdbe0cfcdac3e
+playbook: https://247inc.atlassian.net/wiki/spaces/CIR/overview
+filter:
+  query:
+    bool:
+      must: []
+      filter:
+      - bool:
+          filter:
+          - multi_match:
+              type: phrase
+              query: pcore02
+              lenient: true
+          - bool:
+              filter:
+              - multi_match:
+                  type: phrase
+                  query: 169.254.247.41
+                  lenient: true
+              - multi_match:
+                  type: phrase
+                  query: state Up -> Down
+                  lenient: true
+      - range:
+          '@timestamp':
+            gte: ''
+            lte: ''
+            format: epoch_second
+      should: []
+      must_not: []
+include:
+- message
+create_jira_ticket: false
+notify_client: false
+max_records_to_alert: 5
+alert:
+- email
+- ms_teams
+email:
+  to:
+  - sre-speech-squad@247.ai
+  cc:
+  - ''
+  bcc:
+  - ''
+ms_teams_webhook_url: https://247incc.webhook.office.com/webhookb2/8721e59c-1d3c-463d-ae41-b037dfb9f66b@42fbd5e8-b41c-40ab-9505-9ce8dd91c3e2/IncomingWebhook/8d3d4c4ee0374b6e87bf5037521856a1/6a1a225c-1d56-469d-9b95-837de7792b2b
